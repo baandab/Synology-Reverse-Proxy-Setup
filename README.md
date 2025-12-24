@@ -22,8 +22,8 @@ Here are two examples, one for a container on my Synology NAS, the other on an R
 </ol>
 <h3>Portainer (on Rpi):</h3>
 <ol>
-<li>Redirect http://portainer.myhome.land:80 to https://portainer.myhome.land:443/li>
-<li>Redirect https://portainer.myhome.land:443 to https://10.10.0.130:9443<br>
+<li>Redirect http://portainer.myhome.land:80 to https://portainer.myhome.land:443</li>
+<li>Redirect https://portainer.myhome.land:443 to https://10.10.0.130:9443</li>
 </ol>
 
 <br>
