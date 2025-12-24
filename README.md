@@ -18,7 +18,7 @@ Here are two examples, one for a container on my Synology NAS, the other on an R
 <h3>Plex (on NAS):</h3>
 <ol>
 <li>Redirect http://plex.myhome.land:80 to https://plex.myhome.land:443</li>
-<li>Redirect https://plex.myhome.land:443 to https://localhost:32400<br></li>
+<li>Redirect https://plex.myhome.land:443 to https://localhost:32400</li>
 </ol>
 <h3>Portainer (on Rpi):</h3>
 <ol>
@@ -45,5 +45,7 @@ For Plex and Portainer, you should see:<br>
 <br>
 <h2>How (I think) it works</h2>
 <br>
-When you type in any URL that ends in "myhome.lan" on your LAN, the DNS server (my Firewalla) will redirect the traffic to the IP address of the Synology NAS.On the Synology NAS, the Reverse Proxy then gets the traffic and (if it is HTTP), redirects it to the same URL but as HTTPS. It will also add the Websocket custom headers (if you remembered to do that.)
+When you type in any URL that ends in "myhome.lan" on your LAN, the DNS server (my Firewalla) will redirect the traffic to the IP address of the Synology NAS.<br>
+<br>
+On the Synology NAS, the Reverse Proxy then gets the traffic and (if it is HTTP), redirects it to the same URL but as HTTPS. It will also add the Websocket custom headers (if you remembered to do that.)
 <br><br>Then it gets the HTTPS traffic, and redirects it to either a port on the Synology NAS or to the IP address/Port of a remote host.
