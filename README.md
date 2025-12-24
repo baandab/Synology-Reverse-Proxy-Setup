@@ -29,7 +29,7 @@ Here are two examples, one for a container on my Synology NAS, the other on an R
 <br>
 For the HTTP connections, make sure to add a Websocket Custom Header.
 <br><br>
-Now, you can type in plex.myhome.land or portainer.myhome.land in any browser on my LAN and it resolves.
+Now, you can type in <em>plex.myhome.land</em> or <em>portainer.myhome.land</em> in any browser on my LAN and it resolves.
 <br>
 <h2>/etc/hosts</h2>
 <br>
