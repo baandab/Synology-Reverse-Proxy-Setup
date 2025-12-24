@@ -1,4 +1,4 @@
-<h1>Setting Up Synology Reverse Prozy for your LAN</h1>
+<h1>Setting Up Synology Reverse Proxy for your LAN</h1>
 I was finally able to get the Synology Reverse Proxy to work for my local LAN.  <br>
 
 <br>
