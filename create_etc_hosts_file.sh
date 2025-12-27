@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ----------------------------------------------------------------------
 # Purpose: Convert a reverse‑proxy JSON definition into /etc/hosts entries.
 # Requires: jq (JSON processor)
@@ -134,6 +134,7 @@ cat "$NEW_HOSTS_FILE"
 echo "====================================="
 
 
+
 rm -f "$TMP_OUTPUT" 
 
 #!/bin/bash
@@ -267,11 +268,88 @@ for fe in "${!redirects[@]}"; do
     printf "%s\t%-30s\t# redirect %s\n" "$SYNOLOGY_IP" "$fe" "$sorted_comment"
 done | sort -k2 >> "$NEW_HOSTS_FILE"
 
+python3 - <<'PY' "$JSON_FILE" >> "$NEW_HOSTS_FILE"
+import json
+import sys
+import os
+
+def get_proto(p_code):
+    return "https" if p_code == 1 else "http"
+
+def process_json(raw_data):
+    try:
+        data = json.loads(raw_data)
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON format.")
+        return
+
+    # Filter rules: must have customize_headers and ignore "version" key
+    filtered_rules = [
+        val for key, val in data.items()
+        if key != "version" and val.get('customize_headers')
+    ]
+
+    # Sort by Frontend FQDN
+    sorted_rules = sorted(filtered_rules, key=lambda x: x.get('frontend', {}).get('fqdn', ''))
+
+    if not sorted_rules:
+        return
+
+    print("# " + "-" * 66)
+    print("# Rules with Custom Headers (Sorted by URL)")
+    print("# " + "-" * 66)
+    print("#")
+
+    for val in sorted_rules:
+        f = val.get('frontend', {})
+        b = val.get('backend', {})
+        headers = val.get('customize_headers', [])
+
+        f_fqdn, f_port = f.get('fqdn'), f.get('port')
+        f_proto = get_proto(f.get('protocol'))
+
+        b_fqdn, b_port = b.get('fqdn'), b.get('port')
+        b_proto = get_proto(b.get('protocol'))
+
+        h_list = [f"{h['name']}: {h['value']}" for h in headers]
+        h_str = f"   (headers: {', '.join(h_list)})"
+
+        print(f"# Rule: {f_fqdn}")
+        print(f"#   {f_proto} -> {b_proto}://{b_fqdn}:{b_port}{h_str}")
+        print("#")
+
+if __name__ == "__main__":
+    input_content = None
+
+    # Priority 1: Argument (e.g., ./script.py file.json)
+    if len(sys.argv) > 1:
+        file_path = sys.argv[1]
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                input_content = f.read()
+        else:
+            print(f"Error: File '{file_path}' not found.")
+            sys.exit(1)
+
+    # Priority 2: Piped data (e.g., cat file.json | ./script.py)
+    elif not sys.stdin.isatty():
+        input_content = sys.stdin.read()
+
+    # Priority 3: Default Synology Path
+    else:
+        default_path = '/usr/syno/etc/www/ReverseProxy.json'
+        if os.path.exists(default_path):
+            with open(default_path, 'r') as f:
+                input_content = f.read()
+        else:
+            print("Error: No file provided and default Synology config not found.")
+            sys.exit(1)
+
+    if input_content:
+        process_json(input_content)
+PY
 echo "=== Generated /etc/hosts entries in $NEW_HOSTS_FILE ==="
 cat "$NEW_HOSTS_FILE"
 echo "====================================="
 
-
 rm -f "$TMP_OUTPUT" 
-
-
